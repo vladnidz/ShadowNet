@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 
 class HostAdapter(
     private val hosts: List<HostItem>,
@@ -12,6 +13,7 @@ class HostAdapter(
 ) : RecyclerView.Adapter<HostAdapter.HostViewHolder>() {
 
     class HostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val cardView: MaterialCardView = view as MaterialCardView
         val tvIcon: TextView = view.findViewById(R.id.tvHostIcon)
         val tvIp: TextView = view.findViewById(R.id.tvHostIp)
         val tvHint: TextView = view.findViewById(R.id.tvHostHint)
@@ -26,15 +28,25 @@ class HostAdapter(
     override fun onBindViewHolder(holder: HostViewHolder, position: Int) {
         val item = hosts[position]
         holder.tvIp.text = item.ip
-        holder.tvHint.text = item.typeHint
         holder.tvPing.text = "${item.latencyMs} ms"
 
-        if (item.ip.endsWith(".1")) {
-            holder.tvIcon.text = "🌐"
-        } else if (item.typeHint.contains("Часы", ignoreCase = true)) {
-            holder.tvIcon.text = "⌚"
+        if (item.isCamera) {
+            holder.tvIcon.text = "📹"
+            holder.tvHint.text = "⚠️ Скрытая камера (${item.cameraDetails})"
+            holder.tvHint.setTextColor(0xFFFF3B30.toInt())
+            holder.cardView.strokeColor = 0xFFFF3B30.toInt()
         } else {
-            holder.tvIcon.text = "💻"
+            holder.tvHint.text = item.typeHint
+            holder.tvHint.setTextColor(0xFF8E9992.toInt())
+            holder.cardView.strokeColor = 0xFF1F2B23.toInt()
+
+            if (item.ip.endsWith(".1")) {
+                holder.tvIcon.text = "🌐"
+            } else if (item.typeHint.contains("Часы", ignoreCase = true)) {
+                holder.tvIcon.text = "⌚"
+            } else {
+                holder.tvIcon.text = "💻"
+            }
         }
 
         holder.itemView.setOnClickListener {
@@ -85,9 +97,12 @@ class BleAdapter(
 ) : RecyclerView.Adapter<BleAdapter.BleViewHolder>() {
 
     class BleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val cardBle: MaterialCardView = view as MaterialCardView
+        val tvIcon: TextView = view.findViewById(R.id.tvBleIcon)
         val tvName: TextView = view.findViewById(R.id.tvBleName)
         val tvMac: TextView = view.findViewById(R.id.tvBleMac)
         val tvRssi: TextView = view.findViewById(R.id.tvBleRssi)
+        val tvProximity: TextView = view.findViewById(R.id.tvBleProximity)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BleViewHolder {
@@ -100,6 +115,21 @@ class BleAdapter(
         holder.tvName.text = item.name
         holder.tvMac.text = item.mac
         holder.tvRssi.text = "${item.rssi} dBm"
+        holder.tvProximity.text = item.proximityLabel
+
+        if (item.isTracker) {
+            holder.cardBle.strokeColor = 0xFFFF3B30.toInt()
+            holder.tvName.setTextColor(0xFFFF3B30.toInt())
+            holder.tvIcon.text = when {
+                item.trackerType.contains("Apple", ignoreCase = true) -> "🍎"
+                item.trackerType.contains("Samsung", ignoreCase = true) -> "🔷"
+                else -> "⚠️"
+            }
+        } else {
+            holder.cardBle.strokeColor = 0xFF1F2B23.toInt()
+            holder.tvName.setTextColor(0xFFFFFFFF.toInt())
+            holder.tvIcon.text = "📡"
+        }
 
         val color = when {
             item.rssi >= -55 -> 0xFF00FF66.toInt() // Green (very close)

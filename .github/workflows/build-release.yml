@@ -31,25 +31,24 @@ jobs:
       - name: Prepare APK
         run: |
           mkdir -p release-output
-          find app/build/outputs/apk/ -name "*.apk" -exec cp {} release-output/ShadowNet-v1.0.0.apk \;
+          find app/build/outputs/apk/ -name "*.apk" -exec cp {} release-output/ShadowNet-v1.1.0.apk \;
           ls -lh release-output/
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ShadowNet-v1.0.0-APK
-          path: release-output/ShadowNet-v1.0.0.apk
+          name: ShadowNet-v1.1.0-APK
+          path: release-output/ShadowNet-v1.1.0.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: "ShadowNet v1.0.0 — Wrist Network & BLE Security Auditor"
+          tag_name: v1.1.0
+          name: "ShadowNet v1.1.0 (Spy Cam & AirTag Tracker Hunter)"
           body: |
-            ### 🛰 ShadowNet v1.0.0 — Built for Huawei Watch 3 Pro (HarmonyOS / AOSP)
-            - **Circular 466x466 AMOLED UI**: Pitch-black background with high-contrast neon accents designed for touch interaction on the wrist.
-            - **LAN Radar (Host Discovery)**: High-speed multithreaded ping/socket sweep across the active `/24` subnet. Identifies connected devices, routers, servers, and response latencies.
-            - **Port Audit (Service Scanner)**: Probes administrative and IoT ports (SSH 22, Web 80/443, RTSP 554, MQTT 1883, ADB 5555, HTTP-ALT 8080).
-            - **BLE Radar**: Discovers nearby Bluetooth Low Energy beacons, monitors signal strength (RSSI), and estimates proximity.
-            - **Ping Monitor**: Live real-time latency tracker to gateway and DNS with packet loss analytics.
-          files: release-output/ShadowNet-v1.0.0.apk
+            ### 🛰 ShadowNet v1.1.0 — Spy Cam & AirTag Tracker Hunter
+            - **Spy Cam Detector**: Deep probes subnet for RTSP 554, ONVIF 8899, and Hikvision/Dahua 8000 ports. Discovered cameras immediately float to the top with red alert styling.
+            - **Anti-Stalker / AirTag Radar**: Decodes BLE manufacturer frames (Apple FindMy / AirTag `0x004C`, Samsung SmartTag `0x0075`, Tile `0xFEED`).
+            - **Haptic Proximity Alert**: Clock vibrates physically on wrist when you get within 1-2 meters of a hidden tracker.
+            - **Port Audit & Ping Diagnostic**: Retained full port checker and real-time latency monitor.
+          files: release-output/ShadowNet-v1.1.0.apk

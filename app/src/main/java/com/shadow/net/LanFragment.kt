@@ -136,10 +136,9 @@ class LanFragment : Fragment() {
                             pbScan.progress = ((done * 100) / 254)
                             if (result != null) {
                                 hostList.add(result)
-                                hostList.sortBy { item ->
-                                    val last = item.ip.substringAfterLast(".").toIntOrNull() ?: 999
-                                    last
-                                }
+                                hostList.sortWith(compareByDescending<HostItem> { it.isCamera }.thenBy { item ->
+                                    item.ip.substringAfterLast(".").toIntOrNull() ?: 999
+                                })
                                 hostAdapter.notifyDataSetChanged()
                                 tvFoundCount.text = "Найдено: ${hostList.size} устройств"
                             }
@@ -162,32 +161,50 @@ class LanFragment : Fragment() {
             return HostItem(ip, 0, "Huawei Watch (Текущее устройство)")
         }
 
+        var isReachable = false
         try {
             val addr = InetAddress.getByName(ip)
             if (addr.isReachable(150)) {
-                val latency = System.currentTimeMillis() - start
-                val hint = if (ip.endsWith(".1")) "Шлюз / Wi-Fi Роутер" else "Устройство сети"
-                return HostItem(ip, maxOf(1, latency), hint)
+                isReachable = true
             }
         } catch (e: Exception) {}
 
-        // Fallback: socket probe common ports
-        for (port in listOf(80, 443, 5555, 22, 53, 8080)) {
+        // Проверяем ключевые порты, в том числе видеопотоки камер (554 RTSP, 8000, 8899 ONVIF)
+        var detectedPort = -1
+        for (port in listOf(554, 8000, 8899, 80, 443, 5555, 22, 1883, 8080)) {
             try {
                 val s = Socket()
-                s.connect(InetSocketAddress(ip, port), 100)
+                s.connect(InetSocketAddress(ip, port), 90)
                 s.close()
-                val latency = System.currentTimeMillis() - start
-                val hint = when (port) {
-                    80, 443 -> if (ip.endsWith(".1")) "Роутер (Web GUI)" else "Веб-сервер / Камера"
-                    5555 -> "Android / ADB Устройство"
-                    22 -> "Linux / SSH Сервер"
-                    else -> "Активный хост"
-                }
-                return HostItem(ip, maxOf(1, latency), hint)
+                detectedPort = port
+                isReachable = true
+                break
             } catch (e: Exception) {}
         }
 
-        return null
+        if (!isReachable) return null
+
+        val latency = maxOf(1, System.currentTimeMillis() - start)
+
+        // Идентификация скрытой камеры
+        if (detectedPort == 554 || detectedPort == 8000 || detectedPort == 8899) {
+            val details = when (detectedPort) {
+                554 -> "RTSP 554"
+                8000 -> "Hikvision / Dahua"
+                8899 -> "ONVIF Сервис"
+                else -> "Видеопоток"
+            }
+            return HostItem(ip, latency, "Скрытая IP-камера", isCamera = true, cameraDetails = details)
+        }
+
+        val hint = when {
+            ip.endsWith(".1") -> "Шлюз / Wi-Fi Роутер"
+            detectedPort == 22 -> "Linux / SSH Сервер"
+            detectedPort == 5555 -> "Android / ADB Устройство"
+            detectedPort == 1883 -> "IoT / Умный дом (MQTT)"
+            detectedPort == 80 || detectedPort == 443 -> "Веб-сервер / Панель"
+            else -> "Устройство сети"
+        }
+        return HostItem(ip, latency, hint)
     }
 }
