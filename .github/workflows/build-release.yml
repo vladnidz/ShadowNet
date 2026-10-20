@@ -1,0 +1,55 @@
+name: Build ShadowNet Watch APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: "temurin"
+          cache: "gradle"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Release APK with Gradle Wrapper
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Prepare APK
+        run: |
+          mkdir -p release-output
+          find app/build/outputs/apk/ -name "*.apk" -exec cp {} release-output/ShadowNet-v1.0.0.apk \;
+          ls -lh release-output/
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShadowNet-v1.0.0-APK
+          path: release-output/ShadowNet-v1.0.0.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: "ShadowNet v1.0.0 — Wrist Network & BLE Security Auditor"
+          body: |
+            ### 🛰 ShadowNet v1.0.0 — Built for Huawei Watch 3 Pro (HarmonyOS / AOSP)
+            - **Circular 466x466 AMOLED UI**: Pitch-black background with high-contrast neon accents designed for touch interaction on the wrist.
+            - **LAN Radar (Host Discovery)**: High-speed multithreaded ping/socket sweep across the active `/24` subnet. Identifies connected devices, routers, servers, and response latencies.
+            - **Port Audit (Service Scanner)**: Probes administrative and IoT ports (SSH 22, Web 80/443, RTSP 554, MQTT 1883, ADB 5555, HTTP-ALT 8080).
+            - **BLE Radar**: Discovers nearby Bluetooth Low Energy beacons, monitors signal strength (RSSI), and estimates proximity.
+            - **Ping Monitor**: Live real-time latency tracker to gateway and DNS with packet loss analytics.
+          files: release-output/ShadowNet-v1.0.0.apk

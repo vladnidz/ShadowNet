@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="28dp"
+    android:paddingBottom="24dp"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="📡 BLE RADAR"
+        android:textColor="@color/neon_amber"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvBleStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Эфир: 2.4 GHz Bluetooth"
+        android:textColor="@color/text_muted"
+        android:textSize="11sp" />
+
+    <Button
+        android:id="@+id/btnScanBle"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/neon_amber"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="📡 Сканировать BLE"
+        android:textColor="@color/black"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <ProgressBar
+        android:id="@+id/pbBleScan"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_marginTop="6dp"
+        android:indeterminate="true"
+        android:progressTint="@color/neon_amber"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/tvBleCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Найдено: 0 BLE маяков"
+        android:textColor="@color/neon_amber"
+        android:textSize="11sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBleDevices"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="6dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="30dp" />
+
+</LinearLayout>

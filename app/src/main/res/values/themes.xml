@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ShadowNet" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="colorPrimary">@color/neon_green</item>
+        <item name="colorSecondary">@color/neon_cyan</item>
+        <item name="colorSurface">@color/card_bg</item>
+        <item name="colorOnSurface">@color/text_white</item>
+    </style>
+</resources>
