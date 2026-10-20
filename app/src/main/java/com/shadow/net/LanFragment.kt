@@ -48,7 +48,7 @@ class LanFragment : Fragment() {
         btnScan = v.findViewById(R.id.btnScanLan)
         pbScan = v.findViewById(R.id.pbLanScan)
         tvFoundCount = v.findViewById(R.id.tvLanFoundCount)
-        rvHosts = v.findViewById(R.id.rvHosts)
+        rvHosts = v.findViewById(R.id.rvLanHosts)
 
         hostAdapter = HostAdapter(hostList) { host ->
             (activity as? MainActivity)?.openPortScanner(host.ip)
